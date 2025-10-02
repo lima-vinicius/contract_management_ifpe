@@ -58,12 +58,12 @@ As entregas estão organizadas em fases, sempre relacionadas às demandas das di
 
 ## Marcos Principais
 
-*  Reunião de Levantamento com Cliente – Concluída
-*  Kickoff Oficial do Projeto – [Data de início]
-*  Mapeamento de Processos – Semana 2
-*  Definição de Jornadas de Usuário – Semana 3
-*  Wireframes e Fluxos de Design – Semana 4
-*  Protótipo Conceitual Final – Semana 5
+*  Reunião de Levantamento com Cliente
+*  Kickoff Oficial do Projeto 
+*  Mapeamento de Processos
+*  Definição de Jornadas de Usuário
+*  Wireframes e Fluxos de Design 
+*  Protótipo Conceitual Final 
 ---
 
 ##  Estrutura do Repositório
