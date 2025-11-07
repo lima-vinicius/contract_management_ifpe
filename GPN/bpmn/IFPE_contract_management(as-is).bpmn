@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_IFPE_v2" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.6.1">
+  <bpmn:collaboration id="Collaboration_IFPE">
+    <bpmn:participant id="Participant_IFPE" name="Processo de Gestão de Contratos IFPE (AS-IS Modificado)" processRef="Process_IFPE" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_IFPE" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_IFPE">
+      <bpmn:lane id="Lane_GovFed" name="Governo Federal">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RepassarRecursos</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Matriz" name="IFPE Matriz (Reitoria)">
+        <bpmn:flowNodeRef>Task_DistribuirValores</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ValidarNecessidades</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ConduzirLicitacao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FirmarContratos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ReunirCoordenadores</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Campi" name="IFPE Campi">
+        <bpmn:flowNodeRef>Task_PlanejarDemandas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DiscutirUrgencia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DefinirEquipe</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_IniciarExecucao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Renovacao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_TimerVencimento</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_ContratoEncerrado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Fiscais" name="Equipe de Fiscalização (Campi)">
+        <bpmn:flowNodeRef>Task_FiscalRequisitante</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FiscalTecnico</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FiscalAdmin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Preposto" name="Preposto (Empresa)">
+        <bpmn:flowNodeRef>Task_EnviarDocs</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Financeiro" name="Setor Financeiro (Campi)">
+        <bpmn:flowNodeRef>Task_ProcessarPagamento</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_1" name="Início">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_RepassarRecursos" name="Repassar recursos financeiros">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_DistribuirValores" name="Distribuir e gerenciar valores para os campi">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_PlanejarDemandas" name="Planejar demandas e elaborar Termo de Referência">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ValidarNecessidades" name="Validar necessidades e consolidar planejamento">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ConduzirLicitacao" name="Conduzir processo licitatório (Seleção)">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_FirmarContratos" name="Firmar contratos (1 por campi + 1 Reitoria)">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ReunirCoordenadores" name="Reunir com Coordenadores de Contrato (Alinhamento)">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_DiscutirUrgencia" name="Discutir urgência de execução com Direção">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_DefinirEquipe" name="Definir Gestor, Fiscais e Preposto">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_IniciarExecucao" name="Iniciar Execução do Contrato">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_FiscalRequisitante" name="Fiscal Requisitante: Verificar serviço prestado">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:incoming>Flow_LoopRenovado</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_FiscalTecnico" name="Fiscal Técnico: Confirmar especificações">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_FiscalAdmin" name="Fiscal Administrativo: Checar regularidade da empresa">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_EnviarDocs" name="Preposto: Enviar documentação para nota">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_ProcessarPagamento" name="Setor Financeiro: Receber notas e processar pagamento">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_Renovacao" name="Análise de Renovação?">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_LoopRenovado</bpmn:outgoing>
+      <bpmn:outgoing>Flow_LoopEncerrado</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_RepassarRecursos" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_RepassarRecursos" targetRef="Task_DistribuirValores" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_DistribuirValores" targetRef="Task_PlanejarDemandas" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_PlanejarDemandas" targetRef="Task_ValidarNecessidades" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_ValidarNecessidades" targetRef="Task_ConduzirLicitacao" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_ConduzirLicitacao" targetRef="Task_FirmarContratos" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_FirmarContratos" targetRef="Task_ReunirCoordenadores" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_ReunirCoordenadores" targetRef="Task_DiscutirUrgencia" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_DiscutirUrgencia" targetRef="Task_DefinirEquipe" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_DefinirEquipe" targetRef="Task_IniciarExecucao" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_IniciarExecucao" targetRef="Task_FiscalRequisitante" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_FiscalRequisitante" targetRef="Task_FiscalTecnico" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_FiscalTecnico" targetRef="Task_FiscalAdmin" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_FiscalAdmin" targetRef="Task_EnviarDocs" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_EnviarDocs" targetRef="Task_ProcessarPagamento" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_ProcessarPagamento" targetRef="Event_TimerVencimento" />
+    <bpmn:sequenceFlow id="Flow_LoopRenovado" name="Renovado" sourceRef="Gateway_Renovacao" targetRef="Task_FiscalRequisitante" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Event_TimerVencimento" targetRef="Gateway_Renovacao" />
+    <bpmn:sequenceFlow id="Flow_LoopEncerrado" name="Encerrado" sourceRef="Gateway_Renovacao" targetRef="Event_ContratoEncerrado" />
+    <bpmn:intermediateCatchEvent id="Event_TimerVencimento" name="Prazo de Renovação Atingido">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="Event_ContratoEncerrado" name="Contrato Encerrado">
+      <bpmn:incoming>Flow_LoopEncerrado</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_IFPE">
+      <bpmndi:BPMNShape id="Participant_IFPE_di" bpmnElement="Participant_IFPE" isHorizontal="true">
+        <dc:Bounds x="150" y="80" width="3000" height="950" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Financeiro_di" bpmnElement="Lane_Financeiro" isHorizontal="true">
+        <dc:Bounds x="180" y="880" width="2970" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Preposto_di" bpmnElement="Lane_Preposto" isHorizontal="true">
+        <dc:Bounds x="180" y="730" width="2970" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Fiscais_di" bpmnElement="Lane_Fiscais" isHorizontal="true">
+        <dc:Bounds x="180" y="580" width="2970" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Campi_di" bpmnElement="Lane_Campi" isHorizontal="true">
+        <dc:Bounds x="180" y="380" width="2970" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Matriz_di" bpmnElement="Lane_Matriz" isHorizontal="true">
+        <dc:Bounds x="180" y="230" width="2970" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_GovFed_di" bpmnElement="Lane_GovFed" isHorizontal="true">
+        <dc:Bounds x="180" y="80" width="2970" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="252" y="137" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="258" y="180" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RepassarRecursos_di" bpmnElement="Task_RepassarRecursos">
+        <dc:Bounds x="340" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DistribuirValores_di" bpmnElement="Task_DistribuirValores">
+        <dc:Bounds x="490" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PlanejarDemandas_di" bpmnElement="Task_PlanejarDemandas">
+        <dc:Bounds x="640" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ValidarNecessidades_di" bpmnElement="Task_ValidarNecessidades">
+        <dc:Bounds x="790" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ConduzirLicitacao_di" bpmnElement="Task_ConduzirLicitacao">
+        <dc:Bounds x="940" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FirmarContratos_di" bpmnElement="Task_FirmarContratos">
+        <dc:Bounds x="1090" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReunirCoordenadores_di" bpmnElement="Task_ReunirCoordenadores">
+        <dc:Bounds x="1240" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DiscutirUrgencia_di" bpmnElement="Task_DiscutirUrgencia">
+        <dc:Bounds x="1390" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DefinirEquipe_di" bpmnElement="Task_DefinirEquipe">
+        <dc:Bounds x="1540" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IniciarExecucao_di" bpmnElement="Task_IniciarExecucao">
+        <dc:Bounds x="1690" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FiscalRequisitante_di" bpmnElement="Task_FiscalRequisitante">
+        <dc:Bounds x="1840" y="615" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FiscalTecnico_di" bpmnElement="Task_FiscalTecnico">
+        <dc:Bounds x="1990" y="615" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FiscalAdmin_di" bpmnElement="Task_FiscalAdmin">
+        <dc:Bounds x="2140" y="615" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnviarDocs_di" bpmnElement="Task_EnviarDocs">
+        <dc:Bounds x="2290" y="765" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ProcessarPagamento_di" bpmnElement="Task_ProcessarPagamento">
+        <dc:Bounds x="2440" y="915" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Renovacao_di" bpmnElement="Gateway_Renovacao" isMarkerVisible="true">
+        <dc:Bounds x="2645" y="457" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2639" y="516.5" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_TimerVencimento_di" bpmnElement="Event_TimerVencimento">
+        <dc:Bounds x="2565" y="464" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2555" y="414" width="56" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ContratoEncerrado_di" bpmnElement="Event_ContratoEncerrado">
+        <dc:Bounds x="2782" y="464" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2774" y="507" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="288" y="155" />
+        <di:waypoint x="340" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="440" y="155" />
+        <di:waypoint x="465" y="155" />
+        <di:waypoint x="465" y="305" />
+        <di:waypoint x="490" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="590" y="305" />
+        <di:waypoint x="615" y="305" />
+        <di:waypoint x="615" y="480" />
+        <di:waypoint x="640" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="740" y="480" />
+        <di:waypoint x="765" y="480" />
+        <di:waypoint x="765" y="305" />
+        <di:waypoint x="790" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="890" y="305" />
+        <di:waypoint x="940" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1040" y="305" />
+        <di:waypoint x="1090" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1190" y="305" />
+        <di:waypoint x="1240" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="1340" y="305" />
+        <di:waypoint x="1365" y="305" />
+        <di:waypoint x="1365" y="480" />
+        <di:waypoint x="1390" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="1490" y="480" />
+        <di:waypoint x="1540" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1640" y="480" />
+        <di:waypoint x="1690" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1790" y="480" />
+        <di:waypoint x="1815" y="480" />
+        <di:waypoint x="1815" y="655" />
+        <di:waypoint x="1840" y="655" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="1940" y="655" />
+        <di:waypoint x="1990" y="655" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="2090" y="655" />
+        <di:waypoint x="2140" y="655" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="2240" y="655" />
+        <di:waypoint x="2265" y="655" />
+        <di:waypoint x="2265" y="805" />
+        <di:waypoint x="2290" y="805" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="2390" y="805" />
+        <di:waypoint x="2415" y="805" />
+        <di:waypoint x="2415" y="955" />
+        <di:waypoint x="2440" y="955" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="2540" y="955" />
+        <di:waypoint x="2583" y="955" />
+        <di:waypoint x="2583" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LoopRenovado_di" bpmnElement="Flow_LoopRenovado">
+        <di:waypoint x="2670" y="457" />
+        <di:waypoint x="2670" y="400" />
+        <di:waypoint x="1890" y="400" />
+        <di:waypoint x="1890" y="615" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2674" y="393" width="51" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="2601" y="482" />
+        <di:waypoint x="2645" y="482" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LoopEncerrado_di" bpmnElement="Flow_LoopEncerrado">
+        <di:waypoint x="2695" y="482" />
+        <di:waypoint x="2782" y="482" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2716" y="464" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
