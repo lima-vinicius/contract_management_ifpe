@@ -2,7 +2,19 @@
 
 Repositório oficial do projeto **Concepção de Solução para Gestão de Contratos do IFPE**.
 
-Este repositório reúne a documentação, os artefatos de design e os entregáveis desenvolvidos no contexto das disciplinas **Sistemas de Gestão Empresarial**, **Gestão de Processos de Negócio** e **Planejamento e Gerenciamento de Projetos**, ofertadas pelo Centro de Informática da UFPE.  
+Este repositório reúne a documentação, os artefatos de design e os entregáveis desenvolvidos no contexto das disciplinas **Sistemas de Gestão Empresarial**, **Gestão de Processos de Negócio** e **Planejamento e Gerenciamento de Projetos**, ofertadas pelo **Centro de Informática da Universidade Federal de Pernambuco (CIn/UFPE)**.
+
+O projeto conta com um **protótipo navegável de alta fidelidade**. 
+
+* **Link do protótipo:** https://ifpe-gestao-de-contratos.lovable.app/ 
+
+Para acessar o protótipo, utilize os seguintes perfis:
+
+* **Fluxo da Reitoria:** [reitoria@ifpe.com.br](mailto:reitoria@ifpe.com.br)
+* **Fluxo da Coordenação de Contratos:** [coordenador@ifpe.com.br](mailto:coordenador@ifpe.com.br)
+* **Fluxo do Gestor de Contratos e Fiscais:** [gestor@ifpe.com.br](mailto:gestor@ifpe.com.br)
+
+A senha pode ser qualquer valor digitado.
 
 ---
 
