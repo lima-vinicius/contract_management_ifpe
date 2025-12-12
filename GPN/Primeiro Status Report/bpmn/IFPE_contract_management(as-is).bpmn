@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_IFPE_v2" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.6.1">
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_IFPE_v3" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.9.0">
   <bpmn:collaboration id="Collaboration_IFPE">
-    <bpmn:participant id="Participant_IFPE" name="Processo de Gestão de Contratos IFPE (AS-IS Modificado)" processRef="Process_IFPE" />
+    <bpmn:participant id="Participant_IFPE" name="Processo de Gestão de Contratos IFPE" processRef="Process_IFPE" />
   </bpmn:collaboration>
   <bpmn:process id="Process_IFPE" isExecutable="false">
     <bpmn:laneSet id="LaneSet_IFPE">
@@ -21,9 +21,10 @@
         <bpmn:flowNodeRef>Task_DiscutirUrgencia</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_DefinirEquipe</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Task_IniciarExecucao</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_Renovacao</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_TimerVencimento</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_ContratoEncerrado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Renovacao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SubProcess_Renovacao</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_Fiscais" name="Equipe de Fiscalização (Campi)">
         <bpmn:flowNodeRef>Task_FiscalRequisitante</bpmn:flowNodeRef>
@@ -80,6 +81,37 @@
       <bpmn:incoming>Flow_10</bpmn:incoming>
       <bpmn:outgoing>Flow_11</bpmn:outgoing>
     </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_RepassarRecursos" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_RepassarRecursos" targetRef="Task_DistribuirValores" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_DistribuirValores" targetRef="Task_PlanejarDemandas" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_PlanejarDemandas" targetRef="Task_ValidarNecessidades" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_ValidarNecessidades" targetRef="Task_ConduzirLicitacao" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_ConduzirLicitacao" targetRef="Task_FirmarContratos" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_FirmarContratos" targetRef="Task_ReunirCoordenadores" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_ReunirCoordenadores" targetRef="Task_DiscutirUrgencia" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_DiscutirUrgencia" targetRef="Task_DefinirEquipe" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_DefinirEquipe" targetRef="Task_IniciarExecucao" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_IniciarExecucao" targetRef="Task_FiscalRequisitante" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_FiscalAdmin" targetRef="Task_EnviarDocs" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_EnviarDocs" targetRef="Task_ProcessarPagamento" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_ProcessarPagamento" targetRef="Event_TimerVencimento" />
+    <bpmn:sequenceFlow id="Flow_ToSub" sourceRef="Event_TimerVencimento" targetRef="SubProcess_Renovacao" />
+    <bpmn:sequenceFlow id="Flow_FromSub" sourceRef="SubProcess_Renovacao" targetRef="Gateway_Renovacao" />
+    <bpmn:sequenceFlow id="Flow_LoopRenovado" name="Renovado" sourceRef="Gateway_Renovacao" targetRef="Task_FiscalRequisitante" />
+    <bpmn:sequenceFlow id="Flow_LoopEncerrado" name="Encerrado" sourceRef="Gateway_Renovacao" targetRef="Event_ContratoEncerrado" />
+    <bpmn:intermediateCatchEvent id="Event_TimerVencimento" name="Prazo de Renovação Atingido">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToSub</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Task_ProcessarPagamento" name="Setor Financeiro: Receber notas e processar pagamento">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_EnviarDocs" name="Preposto: Enviar documentação para nota">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:task>
     <bpmn:task id="Task_FiscalRequisitante" name="Fiscal Requisitante: Verificar serviço prestado">
       <bpmn:incoming>Flow_11</bpmn:incoming>
       <bpmn:incoming>Flow_LoopRenovado</bpmn:incoming>
@@ -93,81 +125,106 @@
       <bpmn:incoming>Flow_13</bpmn:incoming>
       <bpmn:outgoing>Flow_14</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:task id="Task_EnviarDocs" name="Preposto: Enviar documentação para nota">
-      <bpmn:incoming>Flow_14</bpmn:incoming>
-      <bpmn:outgoing>Flow_15</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Task_ProcessarPagamento" name="Setor Financeiro: Receber notas e processar pagamento">
-      <bpmn:incoming>Flow_15</bpmn:incoming>
-      <bpmn:outgoing>Flow_16</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:exclusiveGateway id="Gateway_Renovacao" name="Análise de Renovação?">
-      <bpmn:incoming>Flow_17</bpmn:incoming>
-      <bpmn:outgoing>Flow_LoopRenovado</bpmn:outgoing>
-      <bpmn:outgoing>Flow_LoopEncerrado</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_RepassarRecursos" />
-    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_RepassarRecursos" targetRef="Task_DistribuirValores" />
-    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_DistribuirValores" targetRef="Task_PlanejarDemandas" />
-    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_PlanejarDemandas" targetRef="Task_ValidarNecessidades" />
-    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_ValidarNecessidades" targetRef="Task_ConduzirLicitacao" />
-    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_ConduzirLicitacao" targetRef="Task_FirmarContratos" />
-    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_FirmarContratos" targetRef="Task_ReunirCoordenadores" />
-    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_ReunirCoordenadores" targetRef="Task_DiscutirUrgencia" />
-    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_DiscutirUrgencia" targetRef="Task_DefinirEquipe" />
-    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_DefinirEquipe" targetRef="Task_IniciarExecucao" />
-    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_IniciarExecucao" targetRef="Task_FiscalRequisitante" />
     <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_FiscalRequisitante" targetRef="Task_FiscalTecnico" />
     <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_FiscalTecnico" targetRef="Task_FiscalAdmin" />
-    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_FiscalAdmin" targetRef="Task_EnviarDocs" />
-    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_EnviarDocs" targetRef="Task_ProcessarPagamento" />
-    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_ProcessarPagamento" targetRef="Event_TimerVencimento" />
-    <bpmn:sequenceFlow id="Flow_LoopRenovado" name="Renovado" sourceRef="Gateway_Renovacao" targetRef="Task_FiscalRequisitante" />
-    <bpmn:sequenceFlow id="Flow_17" sourceRef="Event_TimerVencimento" targetRef="Gateway_Renovacao" />
-    <bpmn:sequenceFlow id="Flow_LoopEncerrado" name="Encerrado" sourceRef="Gateway_Renovacao" targetRef="Event_ContratoEncerrado" />
-    <bpmn:intermediateCatchEvent id="Event_TimerVencimento" name="Prazo de Renovação Atingido">
-      <bpmn:incoming>Flow_16</bpmn:incoming>
-      <bpmn:outgoing>Flow_17</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_1" />
-    </bpmn:intermediateCatchEvent>
     <bpmn:endEvent id="Event_ContratoEncerrado" name="Contrato Encerrado">
       <bpmn:incoming>Flow_LoopEncerrado</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_Renovacao" name="Análise de Renovação?">
+      <bpmn:incoming>Flow_FromSub</bpmn:incoming>
+      <bpmn:outgoing>Flow_LoopRenovado</bpmn:outgoing>
+      <bpmn:outgoing>Flow_LoopEncerrado</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:subProcess id="SubProcess_Renovacao" name="Renovação / Repactuação (Processo Atual)">
+      <bpmn:incoming>Flow_ToSub</bpmn:incoming>
+      <bpmn:outgoing>Flow_FromSub</bpmn:outgoing>
+      <bpmn:startEvent id="StartEvent_Sub" name="Início Renovação">
+        <bpmn:outgoing>Flow_S1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:task id="Task_CheckPrazo" name="Gestor verifica manualmente o prazo">
+        <bpmn:incoming>Flow_S1</bpmn:incoming>
+        <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Task_BuscaIndices" name="Buscar índices (IPCA, etc.)">
+        <bpmn:incoming>Flow_S2</bpmn:incoming>
+        <bpmn:outgoing>Flow_S3</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Task_EnviaIndices" name="Enviar índices ao preposto (Informal)">
+        <bpmn:incoming>Flow_S3</bpmn:incoming>
+        <bpmn:outgoing>Flow_S4</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:intermediateCatchEvent id="Event_WaitEmpresa" name="Aguardar resposta da contratada">
+        <bpmn:incoming>Flow_S4</bpmn:incoming>
+        <bpmn:outgoing>Flow_S5</bpmn:outgoing>
+        <bpmn:messageEventDefinition />
+      </bpmn:intermediateCatchEvent>
+      <bpmn:task id="Task_CompilarDocs" name="Compilar documentos para renovação">
+        <bpmn:incoming>Flow_S5</bpmn:incoming>
+        <bpmn:outgoing>Flow_S6</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:task id="Task_EnviarAprovacao" name="Enviar documentação para aprovação">
+        <bpmn:incoming>Flow_S6</bpmn:incoming>
+        <bpmn:outgoing>Flow_S7</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:exclusiveGateway id="Gateway_Repactuacao" name="Haverá Repactuação?">
+        <bpmn:incoming>Flow_S7</bpmn:incoming>
+        <bpmn:outgoing>Flow_Repact_Sim</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Repact_Nao</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:task id="Task_EnviaGov" name="Enviar para Órgão Gov / Financeiro / Diretoria do Campi">
+        <bpmn:incoming>Flow_Repact_Sim</bpmn:incoming>
+        <bpmn:outgoing>Flow_S8</bpmn:outgoing>
+      </bpmn:task>
+      <bpmn:intermediateCatchEvent id="Event_WaitGov" name="Aguardar retorno setores">
+        <bpmn:incoming>Flow_S8</bpmn:incoming>
+        <bpmn:outgoing>Flow_S9</bpmn:outgoing>
+        <bpmn:messageEventDefinition />
+      </bpmn:intermediateCatchEvent>
+      <bpmn:endEvent id="EndEvent_Sub" name="Fim Subprocesso">
+        <bpmn:incoming>Flow_Repact_Nao</bpmn:incoming>
+        <bpmn:incoming>Flow_S9</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_S1" sourceRef="StartEvent_Sub" targetRef="Task_CheckPrazo" />
+      <bpmn:sequenceFlow id="Flow_S2" sourceRef="Task_CheckPrazo" targetRef="Task_BuscaIndices" />
+      <bpmn:sequenceFlow id="Flow_S3" sourceRef="Task_BuscaIndices" targetRef="Task_EnviaIndices" />
+      <bpmn:sequenceFlow id="Flow_S4" sourceRef="Task_EnviaIndices" targetRef="Event_WaitEmpresa" />
+      <bpmn:sequenceFlow id="Flow_S5" sourceRef="Event_WaitEmpresa" targetRef="Task_CompilarDocs" />
+      <bpmn:sequenceFlow id="Flow_S6" sourceRef="Task_CompilarDocs" targetRef="Task_EnviarAprovacao" />
+      <bpmn:sequenceFlow id="Flow_S7" sourceRef="Task_EnviarAprovacao" targetRef="Gateway_Repactuacao" />
+      <bpmn:sequenceFlow id="Flow_Repact_Sim" name="Sim" sourceRef="Gateway_Repactuacao" targetRef="Task_EnviaGov" />
+      <bpmn:sequenceFlow id="Flow_Repact_Nao" name="Não" sourceRef="Gateway_Repactuacao" targetRef="EndEvent_Sub" />
+      <bpmn:sequenceFlow id="Flow_S8" sourceRef="Task_EnviaGov" targetRef="Event_WaitGov" />
+      <bpmn:sequenceFlow id="Flow_S9" sourceRef="Event_WaitGov" targetRef="EndEvent_Sub" />
+    </bpmn:subProcess>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_IFPE">
       <bpmndi:BPMNShape id="Participant_IFPE_di" bpmnElement="Participant_IFPE" isHorizontal="true">
-        <dc:Bounds x="150" y="80" width="3000" height="950" />
+        <dc:Bounds x="150" y="80" width="4500" height="1070" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Financeiro_di" bpmnElement="Lane_Financeiro" isHorizontal="true">
-        <dc:Bounds x="180" y="880" width="2970" height="150" />
-        <bpmndi:BPMNLabel />
+        <dc:Bounds x="180" y="980" width="4470" height="170" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Preposto_di" bpmnElement="Lane_Preposto" isHorizontal="true">
-        <dc:Bounds x="180" y="730" width="2970" height="150" />
-        <bpmndi:BPMNLabel />
+        <dc:Bounds x="180" y="820" width="4470" height="160" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Fiscais_di" bpmnElement="Lane_Fiscais" isHorizontal="true">
-        <dc:Bounds x="180" y="580" width="2970" height="150" />
-        <bpmndi:BPMNLabel />
+        <dc:Bounds x="180" y="650" width="4470" height="170" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Campi_di" bpmnElement="Lane_Campi" isHorizontal="true">
-        <dc:Bounds x="180" y="380" width="2970" height="200" />
-        <bpmndi:BPMNLabel />
+        <dc:Bounds x="180" y="370" width="4470" height="280" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_Matriz_di" bpmnElement="Lane_Matriz" isHorizontal="true">
-        <dc:Bounds x="180" y="230" width="2970" height="150" />
-        <bpmndi:BPMNLabel />
+        <dc:Bounds x="180" y="230" width="4470" height="140" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_GovFed_di" bpmnElement="Lane_GovFed" isHorizontal="true">
-        <dc:Bounds x="180" y="80" width="2970" height="150" />
-        <bpmndi:BPMNLabel />
+        <dc:Bounds x="180" y="80" width="4470" height="150" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
         <dc:Bounds x="252" y="137" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="258" y="180" width="27" height="14" />
+          <dc:Bounds x="257" y="183" width="27" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_RepassarRecursos_di" bpmnElement="Task_RepassarRecursos">
@@ -200,37 +257,142 @@
       <bpmndi:BPMNShape id="Task_IniciarExecucao_di" bpmnElement="Task_IniciarExecucao">
         <dc:Bounds x="1690" y="440" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_FiscalRequisitante_di" bpmnElement="Task_FiscalRequisitante">
-        <dc:Bounds x="1840" y="615" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_FiscalTecnico_di" bpmnElement="Task_FiscalTecnico">
-        <dc:Bounds x="1990" y="615" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_FiscalAdmin_di" bpmnElement="Task_FiscalAdmin">
-        <dc:Bounds x="2140" y="615" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_EnviarDocs_di" bpmnElement="Task_EnviarDocs">
-        <dc:Bounds x="2290" y="765" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_ProcessarPagamento_di" bpmnElement="Task_ProcessarPagamento">
-        <dc:Bounds x="2440" y="915" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_Renovacao_di" bpmnElement="Gateway_Renovacao" isMarkerVisible="true">
-        <dc:Bounds x="2645" y="457" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="2639" y="516.5" width="62" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_TimerVencimento_di" bpmnElement="Event_TimerVencimento">
         <dc:Bounds x="2565" y="464" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2555" y="414" width="56" height="40" />
+          <dc:Bounds x="2555" y="414" width="57" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_ContratoEncerrado_di" bpmnElement="Event_ContratoEncerrado">
-        <dc:Bounds x="2782" y="464" width="36" height="36" />
+      <bpmndi:BPMNShape id="SubProcess_Renovacao_di" bpmnElement="SubProcess_Renovacao" isExpanded="true">
+        <dc:Bounds x="2640" y="390" width="1660" height="230" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Sub_di" bpmnElement="StartEvent_Sub">
+        <dc:Bounds x="2680" y="460" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2774" y="507" width="52" height="27" />
+          <dc:Bounds x="2655" y="507" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckPrazo_di" bpmnElement="Task_CheckPrazo">
+        <dc:Bounds x="2790" y="438" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_BuscaIndices_di" bpmnElement="Task_BuscaIndices">
+        <dc:Bounds x="2930" y="438" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnviaIndices_di" bpmnElement="Task_EnviaIndices">
+        <dc:Bounds x="3080" y="438" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_WaitEmpresa_di" bpmnElement="Event_WaitEmpresa">
+        <dc:Bounds x="3232" y="460" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3223" y="500" width="58" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CompilarDocs_di" bpmnElement="Task_CompilarDocs">
+        <dc:Bounds x="3340" y="438" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnviarAprovacao_di" bpmnElement="Task_EnviarAprovacao">
+        <dc:Bounds x="3500" y="438" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Repactuacao_di" bpmnElement="Gateway_Repactuacao" isMarkerVisible="true">
+        <dc:Bounds x="3675" y="453" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3664" y="420" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnviaGov_di" bpmnElement="Task_EnviaGov">
+        <dc:Bounds x="3870" y="490" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_WaitGov_di" bpmnElement="Event_WaitGov">
+        <dc:Bounds x="4092" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4069" y="548" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Sub_di" bpmnElement="EndEvent_Sub">
+        <dc:Bounds x="4212" y="460" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4187" y="436" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_S1_di" bpmnElement="Flow_S1">
+        <di:waypoint x="2716" y="478" />
+        <di:waypoint x="2790" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S2_di" bpmnElement="Flow_S2">
+        <di:waypoint x="2890" y="478" />
+        <di:waypoint x="2930" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S3_di" bpmnElement="Flow_S3">
+        <di:waypoint x="3030" y="478" />
+        <di:waypoint x="3080" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S4_di" bpmnElement="Flow_S4">
+        <di:waypoint x="3180" y="478" />
+        <di:waypoint x="3232" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S5_di" bpmnElement="Flow_S5">
+        <di:waypoint x="3268" y="478" />
+        <di:waypoint x="3340" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S6_di" bpmnElement="Flow_S6">
+        <di:waypoint x="3440" y="478" />
+        <di:waypoint x="3500" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S7_di" bpmnElement="Flow_S7">
+        <di:waypoint x="3600" y="478" />
+        <di:waypoint x="3675" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Repact_Sim_di" bpmnElement="Flow_Repact_Sim">
+        <di:waypoint x="3700" y="503" />
+        <di:waypoint x="3700" y="530" />
+        <di:waypoint x="3870" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3718" y="512" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Repact_Nao_di" bpmnElement="Flow_Repact_Nao">
+        <di:waypoint x="3725" y="478" />
+        <di:waypoint x="4212" y="478" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3958" y="453" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S8_di" bpmnElement="Flow_S8">
+        <di:waypoint x="3970" y="530" />
+        <di:waypoint x="4092" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S9_di" bpmnElement="Flow_S9">
+        <di:waypoint x="4128" y="530" />
+        <di:waypoint x="4230" y="530" />
+        <di:waypoint x="4230" y="496" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_ProcessarPagamento_di" bpmnElement="Task_ProcessarPagamento">
+        <dc:Bounds x="2440" y="1030" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnviarDocs_di" bpmnElement="Task_EnviarDocs">
+        <dc:Bounds x="2290" y="860" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FiscalRequisitante_di" bpmnElement="Task_FiscalRequisitante">
+        <dc:Bounds x="1840" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FiscalTecnico_di" bpmnElement="Task_FiscalTecnico">
+        <dc:Bounds x="1990" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FiscalAdmin_di" bpmnElement="Task_FiscalAdmin">
+        <dc:Bounds x="2140" y="690" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ContratoEncerrado_di" bpmnElement="Event_ContratoEncerrado">
+        <dc:Bounds x="4532" y="462" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4524" y="505" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Renovacao_di" bpmnElement="Gateway_Renovacao" isMarkerVisible="true">
+        <dc:Bounds x="4345" y="455" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4339" y="514" width="63" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
@@ -284,53 +446,57 @@
       <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
         <di:waypoint x="1790" y="480" />
         <di:waypoint x="1815" y="480" />
-        <di:waypoint x="1815" y="655" />
-        <di:waypoint x="1840" y="655" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
-        <di:waypoint x="1940" y="655" />
-        <di:waypoint x="1990" y="655" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
-        <di:waypoint x="2090" y="655" />
-        <di:waypoint x="2140" y="655" />
+        <di:waypoint x="1815" y="730" />
+        <di:waypoint x="1840" y="730" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
-        <di:waypoint x="2240" y="655" />
-        <di:waypoint x="2265" y="655" />
-        <di:waypoint x="2265" y="805" />
-        <di:waypoint x="2290" y="805" />
+        <di:waypoint x="2240" y="730" />
+        <di:waypoint x="2265" y="730" />
+        <di:waypoint x="2265" y="900" />
+        <di:waypoint x="2290" y="900" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
-        <di:waypoint x="2390" y="805" />
-        <di:waypoint x="2415" y="805" />
-        <di:waypoint x="2415" y="955" />
-        <di:waypoint x="2440" y="955" />
+        <di:waypoint x="2390" y="900" />
+        <di:waypoint x="2415" y="900" />
+        <di:waypoint x="2415" y="1070" />
+        <di:waypoint x="2440" y="1070" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
-        <di:waypoint x="2540" y="955" />
-        <di:waypoint x="2583" y="955" />
+        <di:waypoint x="2540" y="1070" />
+        <di:waypoint x="2583" y="1070" />
         <di:waypoint x="2583" y="500" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_LoopRenovado_di" bpmnElement="Flow_LoopRenovado">
-        <di:waypoint x="2670" y="457" />
-        <di:waypoint x="2670" y="400" />
-        <di:waypoint x="1890" y="400" />
-        <di:waypoint x="1890" y="615" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="2674" y="393" width="51" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+      <bpmndi:BPMNEdge id="Flow_ToSub_di" bpmnElement="Flow_ToSub">
         <di:waypoint x="2601" y="482" />
-        <di:waypoint x="2645" y="482" />
+        <di:waypoint x="2640" y="482" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_FromSub_di" bpmnElement="Flow_FromSub">
+        <di:waypoint x="4300" y="478" />
+        <di:waypoint x="4347" y="478" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LoopRenovado_di" bpmnElement="Flow_LoopRenovado">
+        <di:waypoint x="4370" y="455" />
+        <di:waypoint x="4370" y="310" />
+        <di:waypoint x="1890" y="310" />
+        <di:waypoint x="1890" y="690" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4375" y="397" width="51" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_LoopEncerrado_di" bpmnElement="Flow_LoopEncerrado">
-        <di:waypoint x="2695" y="482" />
-        <di:waypoint x="2782" y="482" />
+        <di:waypoint x="4395" y="480" />
+        <di:waypoint x="4532" y="480" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2716" y="464" width="52" height="14" />
+          <dc:Bounds x="4432" y="462" width="52" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="1940" y="730" />
+        <di:waypoint x="1990" y="730" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="2090" y="730" />
+        <di:waypoint x="2140" y="730" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
